@@ -28,3 +28,5 @@ java -XX:+UseParallelGC -XX:ParallelGCThreads=8 -Xms200g -Xmx200g -jar /projects
 samtools index tumor.sorted.nodup.bam
 rm tumor.sam
 rm tumor.sorted.bam
+
+
