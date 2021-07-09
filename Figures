@@ -1,0 +1,48 @@
+library(ggplot2)
+library(ggrepel)
+library(ggthemes)
+library(ggpubr)
+
+Volcnoplot<- read.csv("Volcanoplot_tumor.csv", row.names = 1)
+ggplot(Volcnoplot) + geom_point(aes(x = IncLevelDiff, y = -log10(FDR), colour =Alteration))+ 
+    	ggtitle("Tumor PSI expression") +
+        xlab("PSI Difference (Tumor-Control)") + 
+        ylab("-Log10(FDR)") +theme_bw()+ theme(text = element_text(size=30),axis.text = element_text(size = 30))+
+        theme(legend.position = "right",legend.text=element_text(size=30),
+        plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        axis.title = element_text(size = rel(1.25)))+scale_colour_manual(values = c("#ebecf0", "#FF2400"))
+
+Barplot<- read.csv("Barplot_LUAD_LUSC.csv", row.names = 1) 
+ggbarplot(Barplot, x = "Event", y = "Count",
+          fill= "Histology",
+          xlab = NULL, palette = pal,
+          orientation = "vertical",
+          ggtheme = bp_theme, label = TRUE, lab.size = 8, lab.col = "black", lab.pos = "out")
+
+Violinplot<- read.csv("Violinplot_AA-EA.csv", row.names = 1) 
+ggviolin(Violinplot, x = "Event", y = "PSI.difference", shape="Alteration",
+          color = "Event", size=1,
+          xlab = NULL,ylab= "PSI difference",palette = "npg",
+          add = "jitter",add.params = list(size = 5, jitter = 0.3),
+          orientation = "vertical",
+          ggtheme = bp_theme)
+          
+hp <- read.csv("Oncoplot.csv", row.names = 1 )
+psi <- hp$dPSI
+dir <- hp$direction
+alt <- hp$change
+type <- hp$Type
+mode <- hp$Mode
+reg <- hp$Region
+ 
+mat<-matrix(data = hp, nrow = 25, ncol = 5, byrow = FALSE, dimnames = NULL)
+ha_barplot = rowAnnotation(MeanΔPSI = anno_barplot(psi, gp = gpar(col = "white", fill="darkgrey"), bar_width = 1, width = unit(3, "cm")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
+ha3 = rowAnnotation(Alteration = dir, width = unit(2, "cm"), gp = gpar(col = "white"),col = list(Alteration = colorRamp2(c(-0.5, 0, 0.5), c("brown", "white", "blue"))), annotation_legend_param = list(title = "Alteration (Tumor vs Normal)", color_bar = "continous", at = c(-0.5, 0.5), labels = c("Less Inclusion", "More Inclusion"), legend_height = unit(2, "cm"), title_gp = gpar(fontsize = 14,fontface = "bold")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
+ha1 = rowAnnotation(Type = type, col = list(Type = c("LUAD" = "#CD2626", "LUSC" = "#6a0dad", "Shared"="#2A8E82")), width = unit(2, "cm"), gp = gpar(col = "white"),annotation_legend_param = list(title = "Tumor type", title_gp = gpar(fontsize = 14, fontface = "bold")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
+ha2 = rowAnnotation(Mode = mode, col = list(Mode = c("SE" = "#CD6090", "RI" = "#56B4E9", "MXE" = "#F0E442",  "A5SS" = "orange",  "A3SS" = "lightgrey")), width = unit(2, "cm"), gp = gpar(col = "white"), annotation_legend_param = list(title = "Splicing mode",title_gp = gpar(fontsize = 14, fontface = "bold")),annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
+text = row.names(hp)
+ha_text = rowAnnotation(text = row_anno_text(text), width = max_text_width(text))
+nr = nrow(mat)
+ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha1 +ha2 +ha3
+draw(ht_list, padding = unit(c(2, 20, 2, 20), "mm"), heatmap_legend_side = "right", ht_gap = unit(5, "mm"), column_title = "Alternatively Spliced Cancer Driver Genes",column_title_side = c("top"), column_title_gp = gpar(fontsize = 20, fontface = "bold"))
+          
