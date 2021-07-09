@@ -13,7 +13,6 @@ cd $SLURM_SUBMIT_DIR
 conda init
 source ~/.bashrc
 conda activate py2
-#module load python/2.7.12
 module use /projects/community/modulefiles
 module load STAR/2.5.2a
 module load samtools/1.3.1
