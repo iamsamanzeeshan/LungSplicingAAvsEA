@@ -7,7 +7,6 @@
 #SBATCH --output=rmats2LUNG.out
 #SBATCH --error=rmats2LUNG.error
 
-
 cd $SLURM_SUBMIT_DIR
 
 conda init
