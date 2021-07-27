@@ -1,0 +1,45 @@
+library(dplyr)
+library(ggpubr)
+library(limma)
+ 
+m1 <- read.csv("tumor_psi_matrix.csv", row.names = 1)
+d1 <- read.csv("tumor_clinical_data.csv")
+n1 <- read.csv("normal_psi_matrix.csv", row.names = 1)
+s1 <- read.csv("normal_clinical_data.csv")
+
+age<- d1$Age
+gender<- d1$Gender
+race<- d1$Race
+menthol<- d1$Menthol
+smokeyrs<- d1$Smoke_years
+smokeint<- d1$Smoke_intensity
+smoke <- d1$Smoke
+smokepck <- d1$Smoke_pack_yrs
+Asp <- d1$Aspirin
+Aspday<- d1$Aspirin_prday
+Aspyrs<- d1$Aspirin_yrs
+
+age<- s1$Age
+gender<- s1$Gender
+race<- s1$Race
+menthol<- s1$Menthol
+smokeyrs<- s1$Smoke_years
+smokeint<- s1$Smoke_intensity
+smoke <- s1$Smoke
+smokepck <- s1$Smoke_pack_yrs
+Asp <- s1$Aspirin
+Aspday<- s1$Aspirin_prday
+Aspyrs<- s1$Aspirin_yrs
+
+LRT<- model.matrix(~ race + age + gender, data=m1)
+fit <- lmFit(m1, LRT)
+efit <- eBayes(fit, trend=TRUE)
+all_results <- topTable(efit, n=Inf)
+write.csv(all_results,"RaceAgeGender-Pval-tumor.csv")
+
+LRN<- model.matrix(~ race + age + gender, data=n1)
+fit <- lmFit(n1, LRN)
+efit <- eBayes(fit, trend=TRUE)
+all_results <- topTable(efit, n=Inf)
+write.csv(all_results,"RaceAgeGender-Pval-normal.csv")
+
