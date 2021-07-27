@@ -46,3 +46,4 @@ nr = nrow(mat)
 ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha1 +ha2 +ha3
 draw(ht_list, padding = unit(c(2, 20, 2, 20), "mm"), heatmap_legend_side = "right", ht_gap = unit(5, "mm"), column_title = "Alternatively Spliced Cancer Driver Genes",column_title_side = c("top"), column_title_gp = gpar(fontsize = 20, fontface = "bold"))
           
+
