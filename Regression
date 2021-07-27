@@ -43,3 +43,7 @@ efit <- eBayes(fit, trend=TRUE)
 all_results <- topTable(efit, n=Inf)
 write.csv(all_results,"RaceAgeGender-Pval-normal.csv")
 
+
+
+
+
