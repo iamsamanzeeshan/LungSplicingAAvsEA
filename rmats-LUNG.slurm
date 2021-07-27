@@ -19,3 +19,6 @@ module load samtools/1.3.1
 python2 /projects/community/miniconda3/envs/py2/rMATS/RNASeq-MATS.py -b1 /scratch/tumor.sorted.nodup.bam -b2 /scratch/normal.sorted.nodup.bam -gtf /home/GTF/gencode.v34.primary_assembly.annotation.gtf -o rMATS_Output_LUNG -t 'paired' -libType fr-unstranded -novelSS 1 -len 126 -keepTemp
 
 conda deactivate 
+
+
+
