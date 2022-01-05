@@ -42,7 +42,7 @@ mode <- hp$Mode
 reg <- hp$Region
 ann <- hp$Anno
 
-# nrow and ncol are specific to the matrix input
+# nrow and ncol are specific to the input matrix
 mat<-matrix(data = hp, nrow = 25, ncol = 5, byrow = FALSE, dimnames = NULL)
 ha_barplot = rowAnnotation(MeanΔPSI = anno_barplot(psi, gp = gpar(col = "white", fill="darkgrey"), bar_width = 1, width = unit(3, "cm")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
 ha3 = rowAnnotation(Alteration = dir, width = unit(2, "cm"), gp = gpar(col = "white"),col = list(Alteration = colorRamp2(c(-0.5, 0, 0.5), c("brown", "white", "blue"))), annotation_legend_param = list(title = "Alteration (Tumor vs Normal)", color_bar = "continous", at = c(-0.5, 0.5), labels = c("Less Inclusion", "More Inclusion"), legend_height = unit(2, "cm"), title_gp = gpar(fontsize = 14,fontface = "bold")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
