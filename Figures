@@ -2,9 +2,12 @@ library(ggplot2)
 library(ggrepel)
 library(ggthemes)
 library(ggpubr)
+library(ComplexHeatmap)
+library(circlize)
 
-Volcnoplot<- read.csv("Volcanoplot_tumor.csv", row.names = 1)
-ggplot(Volcnoplot) + geom_point(aes(x = IncLevelDiff, y = -log10(FDR), colour =Alteration))+ 
+#Generating Volcano plots
+Volcanoplot<- read.csv("Volcanoplot_tumor.csv", row.names = 1)
+ggplot(Volcanoplot) + geom_point(aes(x = IncLevelDiff, y = -log10(FDR), colour =Alteration))+ 
     	ggtitle("Tumor PSI expression") +
         xlab("PSI Difference (Tumor-Control)") + 
         ylab("-Log10(FDR)") +theme_bw()+ theme(text = element_text(size=30),axis.text = element_text(size = 30))+
@@ -12,6 +15,7 @@ ggplot(Volcnoplot) + geom_point(aes(x = IncLevelDiff, y = -log10(FDR), colour =A
         plot.title = element_text(size = rel(1.5), hjust = 0.5),
         axis.title = element_text(size = rel(1.25)))+scale_colour_manual(values = c("#ebecf0", "#FF2400"))
 
+#Generating Bar plots
 Barplot<- read.csv("Barplot_LUAD_LUSC.csv", row.names = 1) 
 ggbarplot(Barplot, x = "Event", y = "Count",
           fill= "Histology",
@@ -19,6 +23,7 @@ ggbarplot(Barplot, x = "Event", y = "Count",
           orientation = "vertical",
           ggtheme = bp_theme, label = TRUE, lab.size = 8, lab.col = "black", lab.pos = "out")
 
+#Generating Violin plots
 Violinplot<- read.csv("Violinplot_AA-EA.csv", row.names = 1) 
 ggviolin(Violinplot, x = "Event", y = "PSI.difference", shape="Alteration",
           color = "Event", size=1,
@@ -26,7 +31,8 @@ ggviolin(Violinplot, x = "Event", y = "PSI.difference", shape="Alteration",
           add = "jitter",add.params = list(size = 5, jitter = 0.3),
           orientation = "vertical",
           ggtheme = bp_theme)
-          
+       
+#Generating Oncoplots
 hp <- read.csv("Oncoplot.csv", row.names = 1 )
 psi <- hp$dPSI
 dir <- hp$direction
@@ -34,16 +40,35 @@ alt <- hp$change
 type <- hp$Type
 mode <- hp$Mode
 reg <- hp$Region
+ann <- hp$Anno
  
 mat<-matrix(data = hp, nrow = 25, ncol = 5, byrow = FALSE, dimnames = NULL)
 ha_barplot = rowAnnotation(MeanΔPSI = anno_barplot(psi, gp = gpar(col = "white", fill="darkgrey"), bar_width = 1, width = unit(3, "cm")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
 ha3 = rowAnnotation(Alteration = dir, width = unit(2, "cm"), gp = gpar(col = "white"),col = list(Alteration = colorRamp2(c(-0.5, 0, 0.5), c("brown", "white", "blue"))), annotation_legend_param = list(title = "Alteration (Tumor vs Normal)", color_bar = "continous", at = c(-0.5, 0.5), labels = c("Less Inclusion", "More Inclusion"), legend_height = unit(2, "cm"), title_gp = gpar(fontsize = 14,fontface = "bold")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
 ha1 = rowAnnotation(Type = type, col = list(Type = c("LUAD" = "#CD2626", "LUSC" = "#6a0dad", "Shared"="#2A8E82")), width = unit(2, "cm"), gp = gpar(col = "white"),annotation_legend_param = list(title = "Tumor type", title_gp = gpar(fontsize = 14, fontface = "bold")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
 ha2 = rowAnnotation(Mode = mode, col = list(Mode = c("SE" = "#CD6090", "RI" = "#56B4E9", "MXE" = "#F0E442",  "A5SS" = "orange",  "A3SS" = "lightgrey")), width = unit(2, "cm"), gp = gpar(col = "white"), annotation_legend_param = list(title = "Splicing mode",title_gp = gpar(fontsize = 14, fontface = "bold")),annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
-text = row.names(hp)
+ha4 = rowAnnotation(Region = reg, col = list(Region = c("Extracellular" = "#0072B2", "Transmembrane" = "lightgreen", "Cytoplasmic" = "#D55E00", "SignalPeptide" = "lightpink", "SignalPeptideExtracellular" = "#E7298A", "ExtracellularTransmembrane" = "#009E73", "ExtracellularTransmembraneCytoplasmic" = "maroon", "TransmembraneCytoplasmic" = "tan", "Intronic" = "lightgrey")), width = unit(2, "cm"), gp = gpar(col = "white"), annotation_legend_param = list(title = "Spliced Region",title_gp = gpar(fontsize = 14, fontface = "bold")),annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
+ha5 = rowAnnotation(Type = type, col = list(Type = c("AA" = "#CD2626", "EA" = "#6a0dad", "Shared"="#2A8E82")), width = unit(2, "cm"), gp = gpar(col = "white"),annotation_legend_param = list(title = "Tumor type", title_gp = gpar(fontsize = 14, fontface = "bold")), annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
+ha6 = rowAnnotation(Anno = ann, col = list(Anno = c("EMT" = "#0072B2", "RBP" = "#D55E00")), width = unit(2, "cm"), gp = gpar(col = "white"), annotation_legend_param = list(title = "Protein",title_gp = gpar(fontsize = 14, fontface = "bold")),annotation_name_gp = gpar(fontsize = 14,fontface = "bold"))
 ha_text = rowAnnotation(text = row_anno_text(text), width = max_text_width(text))
+text = row.names(hp)
 nr = nrow(mat)
-ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha1 +ha2 +ha3
-draw(ht_list, padding = unit(c(2, 20, 2, 20), "mm"), heatmap_legend_side = "right", ht_gap = unit(5, "mm"), column_title = "Alternatively Spliced Cancer Driver Genes",column_title_side = c("top"), column_title_gp = gpar(fontsize = 20, fontface = "bold"))
+
+#Generating pathology (ha1) and population (ha5) secific oncoplots
+ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha1 + ha2 + ha3
+ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha5 + ha2 + ha3
+draw(ht_list, padding = unit(c(2, 20, 2, 20), "mm"), heatmap_legend_side = "bottom", ht_gap = unit(5, "mm"), column_title = "Alternatively Spliced Cancer Driver Genes",column_title_side = c("top"), column_title_gp = gpar(fontsize = 20, fontface = "bold"))
           
+ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha1 + ha2 + ha3 + hp4
+ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha5 + ha2 + ha3 + hp4
+draw(ht_list, padding = unit(c(2, 20, 2, 20), "mm"), heatmap_legend_side = "bottom", ht_gap = unit(5, "mm"), column_title = "Alternatively Spliced Surface proteins",column_title_side = c("top"), column_title_gp = gpar(fontsize = 20, fontface = "bold"))
+
+ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha1 + ha2 + ha3 + hp6
+ht_list<-Heatmap(matrix(nrow = nr, ncol = 0), nr, right_annotation = ha_text) + ha_barplot + ha5 + ha2 + ha3 + hp6
+draw(ht_list, padding = unit(c(2, 20, 2, 20), "mm"), heatmap_legend_side = "bottom", ht_gap = unit(5, "mm"), column_title = "Alternatively Spliced EMT and RBP proteins",column_title_side = c("top"), column_title_gp = gpar(fontsize = 20, fontface = "bold"))
+
+#Generating Heatmaps
+Heatmap <- read.csv("IPA_comp.csv", row.names = 1 )
+Heatmap(Heatmap, show_row_names = TRUE, show_col_names = TRUE, c("red", "grey"),row_names_gp = gpar(fontsize = 7), column_names_gp = gpar(fontsize = 8), cluster_columns = FALSE, cluster_rows = FALSE, rect_gp = gpar(col = "grey", lwd = 2))
+
 
