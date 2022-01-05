@@ -6,7 +6,7 @@ library(ComplexHeatmap)
 library(circlize)
 
 #Generating Volcano plots
-Volcanoplot<- read.csv("Volcanoplot_tumor.csv", row.names = 1)
+Volcanoplot<- read.csv("Volcanoplot_comp.csv", row.names = 1)
 ggplot(Volcanoplot) + geom_point(aes(x = IncLevelDiff, y = -log10(FDR), colour =Alteration))+ 
     	ggtitle("Tumor PSI expression") +
         xlab("PSI Difference (Tumor-Control)") + 
@@ -16,7 +16,7 @@ ggplot(Volcanoplot) + geom_point(aes(x = IncLevelDiff, y = -log10(FDR), colour =
         axis.title = element_text(size = rel(1.25)))+scale_colour_manual(values = c("#ebecf0", "#FF2400"))
 
 #Generating Bar plots
-Barplot<- read.csv("Barplot_LUAD_LUSC.csv", row.names = 1) 
+Barplot<- read.csv("Barplot_comp.csv", row.names = 1) 
 ggbarplot(Barplot, x = "Event", y = "Count",
           fill= "Histology",
           xlab = NULL, palette = pal,
@@ -24,13 +24,21 @@ ggbarplot(Barplot, x = "Event", y = "Count",
           ggtheme = bp_theme, label = TRUE, lab.size = 8, lab.col = "black", lab.pos = "out")
 
 #Generating Violin plots
-Violinplot<- read.csv("Violinplot_AA-EA.csv", row.names = 1) 
+Violinplot<- read.csv("Violinplot_comp.csv", row.names = 1) 
 ggviolin(Violinplot, x = "Event", y = "PSI.difference", shape="Alteration",
           color = "Event", size=1,
           xlab = NULL,ylab= "PSI difference",palette = "npg",
           add = "jitter",add.params = list(size = 5, jitter = 0.3),
           orientation = "vertical",
           ggtheme = bp_theme)
+          
+Violinplot<-read.csv("Violinplot_gene.csv")
+ggviolin(Violinplot, x = "Dataset", y = "PSI",
+         color = "Tissue",
+         xlab = NULL,ylab= "PSI for Gene event",palette = c("#4E84C4", "#FC4E07"),
+         add = "mean",
+         orientation = "vertical",facet.by="Type",
+         ggtheme = bp_theme))
        
 #Generating Oncoplots
 hp <- read.csv("Oncoplot.csv", row.names = 1 )
